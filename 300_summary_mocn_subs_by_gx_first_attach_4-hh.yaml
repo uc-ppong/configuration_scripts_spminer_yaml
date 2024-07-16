@@ -1,0 +1,112 @@
+MINE0:
+  # name: summary_mocn_subs_by_gx_first_attach
+  'OFF': 0
+  # 0=No_CACHE 1=MEMORY_ONLY 2=MEMORY_ONLY_SER 3=MEMORY_AND_DISK 4=MEMORY_AND_DISK_SER
+  CACHE_LEVEL: 0
+  # OPTIMIZER FLAG 0=DISABLE 1=ENABLE
+  OPTIMIZER_ENABLE: 1
+  # RECOMMENDED MULTIPLE OF NUMBER OF CORE PER EXECUTOR
+  MIN_PARTITIONS: 20
+  INTERVAL_S: 20
+  START_TIME: '0000'
+  SLEEP_START_TIME: '0000'
+  SLEEP_END_TIME: '0000'
+  SRC_MINELOG_DATA_NAME: summary_mocn_subs_by_gx_first_attach_4
+  SRC_MINELOG_GRAN: hh
+  SRC_SPDATA_ID: 4
+  SRC_MINELOG_BASEDT: "unix_timestamp(session_time) * 1000"
+  SRC_FILTER: ""
+  SRC_TRANSFORM: "*, tx_year as par_year, ((YEAR(tx_date) * 100) + MONTH(tx_date)) as par_month, ((YEAR(tx_date) * 10000) + (MONTH(tx_date) * 100) + DAYOFMONTH(tx_date)) AS par_date"
+  # Use datetime from minelog as destination column for <SRC_TABLE> 0=OFF 1=ON. Destination tx_time column and par_dt is hardcoded if 1
+  SRC_MINELOG_TO_DEST: 0
+  DEST_TYPE: MYSQL
+  TOTAL_DEST: 4
+
+  DEST0:
+    # description: "Destination 0 - summary_mocn_subs_by_gx_first_attach_first_attach"
+    SQL_FINAL: >- 
+      SELECT concat(tx_date, ' ', LPAD(cast(tx_hour as string), 2,'0'), ':00:00') AS summary_date, 
+      'h' AS gran, first_attach_network_type as rat, 
+      first_attach_network_reclaim_type as network_type, 
+      first_attach_network_name AS network_name, 
+      duration_type, 
+      duration_lower_bound, 
+      IF(LOWER(TRIM(duration_upper_bound)) = 'null' OR TRIM(duration_upper_bound) = '', -1, CAST(TRIM(duration_upper_bound) AS INT)) AS duration_upper_bound, 
+      relogin_result, 
+      COUNT(DISTINCT(imsi)) AS unique_subscriber_count, 
+      COUNT(1) AS trans_count 
+      FROM <SRC_TABLE> 
+      GROUP BY summary_date, gran, rat, network_type, network_name, duration_type, duration_lower_bound, duration_upper_bound, relogin_result
+    TABLE: summary_mocn_subs_by_gx_first_attach
+    COLUMN: "*"
+    DUPLICATE_KEY_UPDATE: "unique_subscriber_count = VALUES(unique_subscriber_count),trans_count = VALUES(trans_count),updated_at = current_timestamp()"
+    PARTITION_COLUMN: "par_year,par_month,par_date"
+    # Total grouping layer
+    TOTAL_GF: 0
+
+  DEST1:
+    # description: "Destination 1 - summary_mocn_subs_by_gx_first_attach_first_attach (each RAT, ALL duration)"
+    SQL_FINAL: >- 
+      SELECT concat(tx_date, ' ', LPAD(cast(tx_hour as string), 2,'0'), ':00:00') AS summary_date, 
+      'h' AS gran, first_attach_network_type as rat, 
+      first_attach_network_reclaim_type as network_type, 
+      first_attach_network_name AS network_name, 
+      duration_type, 
+      -99 AS duration_lower_bound, 
+      -99 AS duration_upper_bound, 
+      relogin_result, 
+      COUNT(DISTINCT(imsi)) AS unique_subscriber_count, 
+      COUNT(1) AS trans_count FROM <SRC_TABLE> 
+      GROUP BY summary_date, gran, rat, network_type, network_name, duration_type, duration_lower_bound, duration_upper_bound, relogin_result
+    TABLE: summary_mocn_subs_by_gx_first_attach
+    COLUMN: "*"
+    DUPLICATE_KEY_UPDATE: "unique_subscriber_count = VALUES(unique_subscriber_count),trans_count = VALUES(trans_count),updated_at = current_timestamp()"
+    PARTITION_COLUMN: "par_year,par_month,par_date"
+    # Total grouping layer
+    TOTAL_GF: 0
+
+  DEST2:
+    # description: "Destination 2 - summary_mocn_subs_by_gx_first_attach_first_attach (ALL RAT, each duration)"
+    SQL_FINAL: >-
+      SELECT concat(tx_date, ' ', LPAD(cast(tx_hour as string), 2,'0'), ':00:00') AS summary_date, 
+      'h' AS gran, 
+      '-99' as rat, 
+      first_attach_network_reclaim_type as network_type, 
+      first_attach_network_name AS network_name, 
+      duration_type, 
+      duration_lower_bound, 
+      IF(LOWER(TRIM(duration_upper_bound)) = 'null' OR TRIM(duration_upper_bound) = '', -1, CAST(TRIM(duration_upper_bound) AS INT)) AS duration_upper_bound, 
+      relogin_result, 
+      COUNT(DISTINCT(imsi)) AS unique_subscriber_count, 
+      COUNT(1) AS trans_count FROM <SRC_TABLE> 
+      WHERE first_attach_network_type != '' 
+      GROUP BY summary_date, gran, rat, network_type, network_name, duration_type, duration_lower_bound, duration_upper_bound, relogin_result
+    TABLE: summary_mocn_subs_by_gx_first_attach
+    COLUMN: "*"
+    DUPLICATE_KEY_UPDATE: "unique_subscriber_count = VALUES(unique_subscriber_count),trans_count = VALUES(trans_count),updated_at = current_timestamp()"
+    PARTITION_COLUMN: "par_year,par_month,par_date"
+    # Total grouping layer
+    TOTAL_GF: 0
+
+  DEST3:
+    # description: "Destination 3 - summary_mocn_subs_by_gx_first_attach_first_attach (ALL RAT, ALL duration)"
+    SQL_FINAL: >- 
+      SELECT concat(tx_date, ' ', LPAD(cast(tx_hour as string), 2,'0'), ':00:00') AS summary_date, 
+      'h' AS gran, 
+      '-99' as rat, 
+      first_attach_network_reclaim_type as network_type, 
+      first_attach_network_name AS network_name, 
+      duration_type, -99 AS duration_lower_bound, 
+      -99 AS duration_upper_bound, 
+      relogin_result, 
+      COUNT(DISTINCT(imsi)) AS unique_subscriber_count, 
+      COUNT(1) AS trans_count 
+      FROM <SRC_TABLE> 
+      WHERE first_attach_network_type != '' 
+      GROUP BY summary_date, gran, rat, network_type, network_name, duration_type, duration_lower_bound, duration_upper_bound, relogin_result
+    TABLE: summary_mocn_subs_by_gx_first_attach
+    COLUMN: "*"
+    DUPLICATE_KEY_UPDATE: "unique_subscriber_count = VALUES(unique_subscriber_count),trans_count = VALUES(trans_count),updated_at = current_timestamp()"
+    PARTITION_COLUMN: "par_year,par_month,par_date"
+    # Total grouping layer
+    TOTAL_GF: 0
