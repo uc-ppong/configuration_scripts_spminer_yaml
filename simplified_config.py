@@ -5,9 +5,25 @@ import yaml
 
 
 def replace_placeholders(spingest_section_name, total_ingest):
-    # Read the contents of 00_SYSTEM_SPDATA.txt
-    with open('00_SYSTEM_SPDATA.txt', 'r') as system_file:
-        system_content = system_file.read()
+    # Read the YAML file
+    with open('00_SYSTEM_SPDATA.yaml', 'r') as yaml_file:
+        config_data = yaml.safe_load(yaml_file)
+
+    # Initialize an empty string to store the configuration data
+    system_content = ""
+
+    # Write the SYSTEM section to the string
+    system_content += "[SYSTEM]\n"
+    for key, value in config_data['SYSTEM'].items():
+        system_content += f"SYSTEM.{key}={value}\n"
+
+    # Write the SPDATA section to the string
+    system_content += "\n[SPDATA]\n"
+    for key, value in config_data['SPDATA'].items():
+        system_content += f"SPDATA.{key}={value}\n"
+
+    # Print the output variable
+    print(system_content)
 
     # Read the contents of 01_SPINGEST_HEADER.txt
     with open('01_SPINGEST_HEADER.txt', 'r') as template_file:

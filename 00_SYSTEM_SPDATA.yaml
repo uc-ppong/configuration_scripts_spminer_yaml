@@ -1,0 +1,36 @@
+SYSTEM:
+  HOST_ID: 1
+  DE0_IP: ""
+  DE0_PORT: ""
+  DE1_IP: ""
+  DE1_PORT: ""
+  DB1_DRIVER: "com.mysql.jdbc.Driver"
+  DB1_SERVER: "10.168.51.96"
+  DB1_PORT: 3306
+  DB1_NAME: "drs_report"
+  DB1_USERNAME: "unified"
+  DB1_PASSWORD: "unified"
+  DB1_TIMEOUT: 10
+  HIVE_CONN_STR: "jdbc:hive2://localhost:10000/mocn_gx_report"
+  IMPALA_CONN_STR: "jdbc:hive2://devtestnn1:21050/mocn_gx_report;auth=noSasl"
+  ZOOKEEPER_QUORUM: ""
+  ZOOKEEPER_FC_DIRECTORY: ""
+  WEEK_MODE: 3
+
+SPDATA:
+  TOTAL: 5
+  PATH0: "hdfs:///mocn_gx_report/data/report/data_tdr_traffic_gx/"
+  PARTITION0: "par_year:yyyy,par_month:yyyyMM,par_date:yyyyMMdd"
+  LOCK0: "par_year,par_month,par_date"
+  PATH1: "hdfs:///mocn_gx_report/data/report/data_tdr_mobility_ulr"
+  PARTITION1: "par_year:yyyy,par_month:yyyyMM,par_date:yyyyMMdd"
+  LOCK1: "par_year,par_month,par_date"
+  PATH2: "hdfs:///mocn_gx_report/data/report/data_tdr_mobility_lug"
+  PARTITION2: "par_year:yyyy,par_month:yyyyMM,par_date:yyyyMMdd"
+  LOCK2: "par_year,par_month,par_date"
+  PATH3: "hdfs:///mocn_gx_report/data/report/data_tdr_reclaim_session/"
+  PARTITION3: "par_year:yyyy,par_month:yyyyMM,par_date:yyyyMMdd"
+  LOCK3: "par_year,par_month,par_date"
+  PATH4: "hdfs:///mocn_gx_report/data/report/data_tdr_post_reclaim/"
+  PARTITION4: "par_year:yyyy,par_month:yyyyMM,par_date:yyyyMMdd"
+  LOCK4: "par_year,par_month,par_date"
