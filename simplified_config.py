@@ -140,9 +140,17 @@ def replace_miner_placeholders(spminer_section_name, total_miner):
                             output_content += f"{spminer_section_name}.{key}_{sub_key}={sub_value}\n"
 
     # Read the contents of 400_SPMERGE.txt
-    with open('400_SPMERGE.txt', 'r') as spmerge_file:
-        merge_content = spmerge_file.read()
-        output_content += '\n' + merge_content
+    # with open('400_SPMERGE.txt', 'r') as spmerge_file:
+    #   merge_content = spmerge_file.read()
+    #   output_content += '\n' + merge_content
+
+    with open('400_SPMERGE.yaml', 'r') as spmerge_file:
+        merge_content = yaml.safe_load(spmerge_file)
+
+    # Write the SYSTEM section to the string
+    output_content += "\n[SPMERGE]\n"
+    for key, value in merge_content['SPMERGE'].items():
+        output_content += f"SPMERGE.{key}={value}\n"
 
     # Write to the output file
     with open('mocn_gx_report.properties', 'w') as output_file:
