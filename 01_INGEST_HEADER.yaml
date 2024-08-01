@@ -1,0 +1,19 @@
+SPINGEST:
+  #0 is run once then exit, 1 is run intervally
+  RUNNING_MODE: 1
+  #0 - threads run one after another, 1 - threads run parallel
+  THREAD_MODE: 0
+  MODULE_NAME: "spingest"
+  MODULE_ID: 100
+  MODULE_INSTANCE: 0
+  HIVE_RELOAD: 1
+  IMPALA_RELOAD: 1
+  TOTAL_MEMTBL: 0
+  MEMTBL0_TOTAL_SRC: ""
+  MEMTBL0_SRC0_PATH: ""
+  MEMTBL0_SRC0_TMP_NAME: ""
+  MEMTBL0_SRC1_PATH: ""
+  MEMTBL0_SRC1_TMP_NAME: ""
+  MEMTBL0_QUERY: ""
+  MEMTBL0_NAME: "mt1"
+  TOTAL_MINE: "{total_ingest}"

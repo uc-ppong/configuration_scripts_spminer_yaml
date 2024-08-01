@@ -1,0 +1,10 @@
+SPMINER:
+  # 0 is run once then exit, 1 is run intervally
+  RUNNING_MODE: 1
+  MODULE_NAME: "spminer"
+  MODULE_ID: 900
+  MODULE_INSTANCE: 0
+  HIVE_RELOAD: 1
+  IMPALA_RELOAD: 1
+  SPMINER.ZOOKEEPER_OFF: 1
+  TOTAL_MINE: "{total_miner}"

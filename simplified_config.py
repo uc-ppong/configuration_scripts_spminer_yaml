@@ -22,16 +22,21 @@ def replace_placeholders(spingest_section_name, total_ingest):
     for key, value in config_data['SPDATA'].items():
         system_content += f"SPDATA.{key}={value}\n"
 
-    # Print the output variable
-    print(system_content)
-
     # Read the contents of 01_SPINGEST_HEADER.txt
-    with open('01_SPINGEST_HEADER.txt', 'r') as template_file:
-        template_content = template_file.read()
+    with open('01_INGEST_HEADER.yaml', 'r') as yaml_file:
+        ingest_data = yaml.safe_load(yaml_file)
 
-    # Replace placeholders in the template content
-    template_content = template_content.replace('{spingest_section_name}', spingest_section_name)
-    template_content = template_content.replace('{total_ingest}', str(total_ingest))
+    yaml_ingest_key = "SPINGEST"
+    # Replace the value of TOTAL_MINE
+    ingest_data[yaml_ingest_key]['TOTAL_MINE'] = total_ingest
+
+    # Initialize an empty string to store the configuration data
+    template_content = ""
+
+    # Write the section to the string
+    template_content += f"[{spingest_section_name}]\n"
+    for key, value in ingest_data[yaml_ingest_key].items():
+        template_content += f"{spingest_section_name}.{key}={value}\n"
 
     # Combine the contents
     output_content = system_content + '\n' + template_content
@@ -64,7 +69,7 @@ def replace_placeholders(spingest_section_name, total_ingest):
                                 print(
                                     f"Processing key-value pair: {sub_sub_key} - {sub_sub_value}")  # Debug: Print key-value pairs
                                 if sub_sub_key is False:
-                                    output_content += f"{spingest_section_name}.{key}_{sub_key}_OFF={sub_sub_value}"
+                                    output_content += f"{spingest_section_name}.{key}_{sub_key}_OFF={sub_sub_value}\n"
                                 elif isinstance(sub_sub_value, str) or isinstance(sub_sub_value, int):
                                     # DEST
                                     output_content += f"{spingest_section_name}.{key}_{sub_key}_{sub_sub_key}={sub_sub_value}\n"
@@ -73,7 +78,7 @@ def replace_placeholders(spingest_section_name, total_ingest):
                                     for i, minelog in enumerate(sub_sub_value):
                                         output_content += "\n"
                                         for log_key, log_value in minelog.items():
-                                            output_content += f"{spingest_section_name}.{key}_{sub_key}_MINELOG{i}_{log_key}={log_value}"
+                                            output_content += f"{spingest_section_name}.{key}_{sub_key}_MINELOG{i}_{log_key}={log_value}\n"
                         elif isinstance(sub_value, str) or isinstance(sub_value, int):
                             output_content += f"{spingest_section_name}.{key}_{sub_key}={sub_value}\n"
 
@@ -87,13 +92,29 @@ def replace_miner_placeholders(spminer_section_name, total_miner):
     with open('simplified_output.txt', 'r') as system_file:
         system_content = system_file.read()
 
-    # Read the contents of 03_SPMINER_HEADER.txt
-    with open('03_SPMINER_HEADER.txt', 'r') as template_file:
-        template_content = template_file.read()
+    # # Read the contents of 03_SPMINER_HEADER.txt
+    # with open('03_SPMINER_HEADER.txt', 'r') as template_file:
+    #     template_content = template_file.read()
+    #
+    # # Replace placeholders in the template content
+    # template_content = template_content.replace('{spminer_section_name}', spminer_section_name)
+    # template_content = template_content.replace('{total_miner}', str(total_miner))
 
-    # Replace placeholders in the template content
-    template_content = template_content.replace('{spminer_section_name}', spminer_section_name)
-    template_content = template_content.replace('{total_miner}', str(total_miner))
+    # Read the contents of 01_SPINGEST_HEADER.txt
+    with open('02_MINER_HEADER.yaml', 'r') as yaml_file:
+        ingest_data = yaml.safe_load(yaml_file)
+
+    yaml_miner_key = "SPMINER"
+    # Replace the value of TOTAL_MINE
+    ingest_data[yaml_miner_key]['TOTAL_MINE'] = total_miner
+
+    # Initialize an empty string to store the configuration data
+    template_content = ""
+
+    # Write the section to the string
+    template_content += f"[{spminer_section_name}]\n"
+    for key, value in ingest_data[yaml_miner_key].items():
+        template_content += f"{spminer_section_name}.{key}={value}\n"
 
     # Combine the contents
     output_content = system_content + '\n' + template_content
@@ -119,7 +140,7 @@ def replace_miner_placeholders(spminer_section_name, total_miner):
                 if isinstance(value, dict):
                     # MINE level
                     output_content += f"##{key} - {value.get('name', '')}\n"
-                    #output_content += "\n"
+                    output_content += "\n"
                     for sub_key, sub_value in value.items():
                         if isinstance(sub_value, dict):
                             #Each DEST
